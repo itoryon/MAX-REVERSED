@@ -26,13 +26,13 @@
         ┌───────────┼───────────┐
         │           │           │
     account ID   device.id   lifecycle
-        │           │
-        │       android_id
-        │           │
-        │      Advertising ID
-        │           │
-        │       App Set ID
-        │           │
+        │           │           |
+        │       android_id      |
+        │           │           |
+        │      Advertising ID   |
+        │           │           |
+        │       App Set ID      |
+        │           │           |
         └──── MyTracker ────────┘
                     │
               protobuf
