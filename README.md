@@ -73,8 +73,21 @@
 собирается и даже не выкачивается целиком** — в нём есть файл `smali_classes2/nul.smali`
 (`nul` — зарезервированное имя устройства в Windows, NTFS не даёт его создать).
 
-Пайплайн: `checkout → apktool b → zipalign → apksigner (свой ключ) → артефакт`.
+Пайплайн: `checkout → проверка патчей → apktool b → zipalign → apksigner (свой ключ) → артефакт`.
+Каждая сборка проверяется стражем ([.github/scripts/verify-patches.sh](.github/scripts/verify-patches.sh)):
+если вырезанная телеметрия/детект вернулись в smali — билд падает.
 Подробности и все фазы — в [PLAN.md](PLAN.md).
+
+### Релизы и ручной запуск
+
+APK любой сборки лежит в артефактах run (вкладка Actions). Кроме того:
+
+- **Ручной запуск.** Actions → «Build MAX (patched)» → «Run workflow». Параметры:
+  - `publish_release` — публиковать ли GitHub Release (по умолчанию нет, просто артефакт);
+  - `release_type` — `prerelease` или `release`;
+  - `release_tag` — тег/имя (пусто = авто `build-<номер>`).
+- **По тегу.** Пуш тега `v*` (например, `v26.29.1-1`) сам соберёт и опубликует релиз;
+  тег с суффиксом через дефис (`-beta`, `-rc`, `-pre`) уходит как pre-release, иначе — обычный.
 
 ## Структура репозитория
 
