@@ -21,30 +21,26 @@
 ## 📡 Цепочка фингерпринтинга устройства (MyTracker)
 
 Ниже — путь данных от сбора идентификаторов устройства до их отправки на сервер аналитики.
-flowchart TD
-    A[Android Device] --> B[Сбор идентификаторов]
-    
-    B --> C[account ID]
-    B --> D[device.id]
-    B --> E[lifecycle data]
-    
-    C --> F[MyTracker]
-    D --> G[android_id]
-    D --> H[Advertising ID]
-    D --> I[App Set ID]
-    
-    G --> F
-    H --> F
-    I --> F
-    E --> F
-    
-    F --> J[Protobuf сериализация]
-    J --> K[gzip компрессия]
-    K --> L[HTTP POST]
-    L --> M[tracker-api.vk-analytics.ru/v3/]
-    
-    style F fill:#f9f,stroke:#333,stroke-width:2px
-    style M fill:#f96,stroke:#333,stroke-width:2px
+MAX
+|
+|=> account ID
+|
+|=> device ID
+|   |=> android ID
+|   |=> Advertising ID
+|   |=> App Set ID
+|
+| lifecycle
+| 
+|==> MyTracker
+    |
+    |=> Protobuf 
+    |
+    |=> gzip
+    |
+    |=> HTTP POST
+    |
+    |=> tracker-api.vk-analytics.ru/v3/
 ---
 
 ## 🔍 Что мы делаем
