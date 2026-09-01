@@ -13,6 +13,8 @@
 - ✅ **OneLog** — `OneLogImpl.append`/`upload` → no-op (`smali/ru/ok/android/onelog/OneLogImpl.smali`). Funnel для всех путей логирования (включая deprecated `OneLog.log`). Сбор и отправка на сервер прекращены.
 - ✅ **ok.tracer** — планировщик загрузки `SampleUploadWorker` (метод `i()` в `smali_classes2/dx7.smali`) → no-op. Крэши/heap/диск/перф собираются локально, но не улетают. Это единственный enqueue-путь воркера.
 - ✅ **VPN-предупреждение** — подавлена эмиссия эффекта `ShowVpnConnectedWarning` (`smali_classes2/gx4.smali`): VPN-флаг обнулён перед показом. Классификация сети и сам детект не тронуты (осознанно, чтобы не сломать WiFi/cellular-логику).
+- ✅ **VPN-панель в звонках** — `VpnPanelWidget` больше не добавляется в панели звонка (`smali_classes2/jx1.smali`): форс-скип создания виджета.
+- ✅ **Страж телеметрии в CI** — `.github/scripts/verify-patches.sh` + шаг в workflow: сборка падает, если любой вырезанный паттерн (initTracker, OneLog→Collector, SampleUploadWorker enqueue, VPN-гварды) вернётся в smali. Защита от регресса при обновлении MAX.
 
 Разведано и осознанно НЕ трогаем:
 - **VK Push** (`com/vk/push/*`, 326 файлов) — это уведомления, не телеметрия.
