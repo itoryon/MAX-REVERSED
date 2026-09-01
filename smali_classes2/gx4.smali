@@ -1140,6 +1140,8 @@
 
     move-result p1
 
+    const/4 p1, 0x0
+
     if-eqz p1, :cond_24
 
     iget-object p0, p0, Lwmg;->u:Lue6;
