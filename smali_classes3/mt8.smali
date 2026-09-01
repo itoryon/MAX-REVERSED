@@ -1,0 +1,87 @@
+.class public final Lmt8;
+.super Lncg;
+.source "SourceFile"
+
+
+# instance fields
+.field public final u:Lr9a;
+
+
+# direct methods
+.method public constructor <init>(Landroid/content/Context;Lr9a;)V
+    .locals 2
+
+    new-instance v0, La3c;
+
+    const/4 v1, 0x1
+
+    invoke-direct {v0, p1, v1}, La3c;-><init>(Landroid/content/Context;Z)V
+
+    invoke-direct {p0, v0}, Lsje;-><init>(Landroid/view/View;)V
+
+    iput-object p2, p0, Lmt8;->u:Lr9a;
+
+    return-void
+.end method
+
+
+# virtual methods
+.method public final bridge synthetic B(Laa9;)V
+    .locals 0
+
+    check-cast p1, Lht8;
+
+    invoke-virtual {p0, p1}, Lmt8;->H(Lht8;)V
+
+    return-void
+.end method
+
+.method public final H(Lht8;)V
+    .locals 3
+
+    iget-object p0, p0, Lsje;->a:Landroid/view/View;
+
+    check-cast p0, La3c;
+
+    sget-object v0, Lv2c;->b:Lv2c;
+
+    invoke-virtual {p0, v0}, La3c;->setCallButtonMode(Lv2c;)V
+
+    iget-object v0, p1, Lht8;->b:Ljava/lang/String;
+
+    invoke-virtual {p0, v0}, La3c;->setTitle(Ljava/lang/CharSequence;)V
+
+    iget-wide v0, p1, Lht8;->a:J
+
+    iget-object v2, p1, Lht8;->d:Ljava/lang/CharSequence;
+
+    iget-object p1, p1, Lht8;->c:Landroid/net/Uri;
+
+    if-eqz p1, :cond_0
+
+    invoke-virtual {p1}, Landroid/net/Uri;->toString()Ljava/lang/String;
+
+    move-result-object p1
+
+    if-nez p1, :cond_1
+
+    :cond_0
+    sget-object p1, Landroid/net/Uri;->EMPTY:Landroid/net/Uri;
+
+    invoke-virtual {p1}, Landroid/net/Uri;->toString()Ljava/lang/String;
+
+    move-result-object p1
+
+    :cond_1
+    invoke-virtual {p0, v0, v1, v2, p1}, La3c;->j(JLjava/lang/CharSequence;Ljava/lang/String;)V
+
+    const/4 p1, 0x0
+
+    invoke-virtual {p0, p1}, La3c;->setSelectionEnabled(Z)V
+
+    const/4 p1, 0x0
+
+    invoke-virtual {p0, p1}, La3c;->setOnClickListener(Landroid/view/View$OnClickListener;)V
+
+    return-void
+.end method

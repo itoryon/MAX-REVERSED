@@ -1,0 +1,27 @@
+version: 3.0.2
+apkFileName: MAX.apk
+usesFramework:
+  ids:
+  - 1
+sdkInfo:
+  minSdkVersion: 26
+  targetSdkVersion: 37
+versionInfo:
+  versionCode: 6808
+  versionName: 26.29.1
+resourcesInfo:
+  packageId: 127
+doNotCompress:
+- arsc
+- m4a
+- png
+- so
+- webp
+- META-INF/services/g4i
+- META-INF/services/gw8
+- META-INF/services/ru.ok.android.onelog.OneLogAppender
+- META-INF/services/ru.ok.android.onelog.OneLogConfig$Delegate
+- assets/dexopt/baseline.prof
+- assets/dexopt/baseline.profm
+- io/opentelemetry/api/version.properties
+- io/opentelemetry/context/version.properties
