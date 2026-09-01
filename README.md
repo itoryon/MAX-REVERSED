@@ -30,17 +30,17 @@ MAX
 |   |=> Advertising ID                                                                       
 |   |=> App Set ID                                                                           
 |                                                                                         
-| lifecycle                                                                                  
+|=>lifecycle                                                                                  
 |                                                                                          
 |==> MyTracker                                                                               
-    |                                                                                        
-    |=> Protobuf                                                                             
-    |                                                                                        
-    |=> gzip                                                                                 
-    |                                                                                        
-    |=> HTTP POST                                                                            
-    |                                                                                        
-    |=> tracker-api.vk-analytics.ru/v3/                                                      
+      |                                                                                        
+      |=> Protobuf                                                                             
+      |                                                                                        
+      |=> gzip                                                                                 
+      |                                                                                        
+      |=> HTTP POST                                                                            
+      |                                                                                        
+      |=> tracker-api.vk-analytics.ru/v3/                                                      
 ---
 
 ## 🔍 Что мы делаем
