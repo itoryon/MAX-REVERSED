@@ -592,7 +592,6 @@
 
     const-string v1, "34982109644049932883"
 
-    invoke-static {v1, v8}, Lcom/my/tracker/MyTracker;->initTracker(Ljava/lang/String;Landroid/app/Application;)V
 
     invoke-virtual {v0}, Lfcf;->u()Lt17;
 
