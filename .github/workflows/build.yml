@@ -1,0 +1,148 @@
+name: Build MAX (patched)
+
+on:
+  push:
+    branches: [ "**" ]
+    tags: [ "v*" ]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: "Опубликовать GitHub Release с APK?"
+        type: boolean
+        default: false
+      release_type:
+        description: "Тип релиза (учитывается только при публикации)"
+        type: choice
+        options:
+          - prerelease
+          - release
+        default: prerelease
+      release_tag:
+        description: "Тег/имя релиза (пусто = авто build-<номер>)"
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+env:
+  APKTOOL_VERSION: 3.0.2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify telemetry/detect patches
+        run: bash .github/scripts/verify-patches.sh
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Download apktool ${{ env.APKTOOL_VERSION }}
+        run: |
+          curl -fL -o apktool.jar \
+            "https://github.com/iBotPeaches/Apktool/releases/download/v${APKTOOL_VERSION}/apktool_${APKTOOL_VERSION}.jar"
+          java -jar apktool.jar --version
+
+      - name: Build APK (apktool b)
+        run: |
+          java -jar apktool.jar b . -o MAX-patched-unsigned.apk
+
+      - name: Locate Android build-tools
+        id: sdk
+        run: |
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          BT=$(ls -d "$SDK"/build-tools/*/ | sort -V | tail -1)
+          echo "path=$BT" >> "$GITHUB_OUTPUT"
+          echo "Using build-tools: $BT"
+
+      - name: Zipalign
+        run: |
+          "${{ steps.sdk.outputs.path }}zipalign" -p -f 4 \
+            MAX-patched-unsigned.apk MAX-patched-aligned.apk
+
+      - name: Prepare signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+            {
+              echo "KS=release.keystore"
+              echo "KS_PASS=$KEYSTORE_PASSWORD"
+              echo "KS_ALIAS=$KEY_ALIAS"
+              echo "KS_KEYPASS=$KEY_PASSWORD"
+            } >> "$GITHUB_ENV"
+            echo "Using keystore from secrets."
+          else
+            keytool -genkeypair -v -keystore release.keystore -alias maxkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass maxmax -keypass maxmax \
+              -dname "CN=MAX-REVERSED, OU=dev, O=dev, L=NA, S=NA, C=NA"
+            {
+              echo "KS=release.keystore"
+              echo "KS_PASS=maxmax"
+              echo "KS_ALIAS=maxkey"
+              echo "KS_KEYPASS=maxmax"
+            } >> "$GITHUB_ENV"
+            echo "No secrets set — generated an ephemeral debug keystore."
+          fi
+
+      - name: Sign APK
+        run: |
+          "${{ steps.sdk.outputs.path }}apksigner" sign \
+            --ks "$KS" --ks-pass "pass:$KS_PASS" \
+            --ks-key-alias "$KS_ALIAS" --key-pass "pass:$KS_KEYPASS" \
+            --out MAX-patched.apk MAX-patched-aligned.apk
+          "${{ steps.sdk.outputs.path }}apksigner" verify --print-certs MAX-patched.apk
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MAX-patched-apk
+          path: MAX-patched.apk
+          if-no-file-found: error
+
+      - name: Publish GitHub Release
+        if: >
+          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+          (github.event_name == 'workflow_dispatch' && inputs.publish_release)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          IN_TAG: ${{ inputs.release_tag }}
+          IN_TYPE: ${{ inputs.release_type }}
+          REF_NAME: ${{ github.ref_name }}
+          RUN_NUMBER: ${{ github.run_number }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -e
+          PRE=""
+          TARGET=""
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            TAG="$IN_TAG"
+            [ -z "$TAG" ] && TAG="build-$RUN_NUMBER"
+            [ "$IN_TYPE" = "prerelease" ] && PRE="--prerelease"
+            TARGET="--target $SHA"
+          else
+            TAG="$REF_NAME"
+            case "$TAG" in *-*) PRE="--prerelease" ;; esac
+          fi
+          cp MAX-patched.apk "MAX-${TAG}.apk"
+          NOTES="Автосборка MAX с вырезанной телеметрией/детектами. Подробности — PLAN.md. Рантайм не гарантирован — проверяйте на своём устройстве."
+          if ! gh release create "$TAG" "MAX-${TAG}.apk" \
+                --title "MAX patched — $TAG" --notes "$NOTES" $PRE $TARGET; then
+            echo "Релиз с тегом $TAG уже существует — заливаю APK в него."
+            gh release upload "$TAG" "MAX-${TAG}.apk" --clobber
+          fi
+          echo "Готово: релиз $TAG (${PRE:-обычный})."

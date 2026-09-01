@@ -320,6 +320,8 @@
 
     move-result v0
 
+    const/4 v0, 0x1
+
     if-nez v0, :cond_3
 
     invoke-virtual {v2, v8}, Ltze;->S(Z)V

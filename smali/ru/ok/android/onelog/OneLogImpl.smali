@@ -234,18 +234,6 @@
 
 .method public static upload(Ljava/lang/String;Lru/ok/android/onelog/OneLogTrigger;)V
     .locals 0
-    .annotation system Ldalvik/annotation/Throws;
-        value = {
-            Ljava/io/IOException;
-        }
-    .end annotation
-
-    .line 90
-    invoke-static {p0}, Lru/ok/android/onelog/Collector;->getInstance(Ljava/lang/String;)Lru/ok/android/onelog/Collector;
-
-    move-result-object p0
-
-    invoke-virtual {p0, p1}, Lru/ok/android/onelog/Collector;->upload(Lru/ok/android/onelog/OneLogTrigger;)V
 
     return-void
 .end method
@@ -254,16 +242,6 @@
 # virtual methods
 .method public append(Lru/ok/android/onelog/OneLogItem;)V
     .locals 0
-
-    invoke-virtual {p1}, Lru/ok/android/onelog/OneLogItem;->collector()Ljava/lang/String;
-
-    move-result-object p0
-
-    invoke-static {p0}, Lru/ok/android/onelog/Collector;->getInstance(Ljava/lang/String;)Lru/ok/android/onelog/Collector;
-
-    move-result-object p0
-
-    invoke-virtual {p0, p1}, Lru/ok/android/onelog/Collector;->append(Lru/ok/android/onelog/OneLogItem;)V
 
     return-void
 .end method
