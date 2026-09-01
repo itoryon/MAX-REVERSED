@@ -21,32 +21,28 @@
 ## 📡 Цепочка фингерпринтинга устройства (MyTracker)
 
 Ниже — путь данных от сбора идентификаторов устройства до их отправки на сервер аналитики.
-```mermaid
-flowchart TD
-    APP["MAX App"]
-
-    APP --> ACC["account ID"]
-    APP --> DEV["device.id"]
-    APP --> LIFE["lifecycle events"]
-
-    DEV --> AID["android_id"]
-    DEV --> ADID["Advertising ID (GAID)"]
-    DEV --> ASID["App Set ID"]
-
-    ACC --> MT["MyTracker SDK"]
-    AID --> MT
-    ADID --> MT
-    ASID --> MT
-    LIFE --> MT
-
-    MT --> PB["Сериализация: Protobuf"]
-    PB --> GZ["Сжатие: gzip"]
-    GZ --> POST["HTTP POST"]
-    POST --> API["tracker-api.vk-analytics.ru/v3/"]
-
-    style MT fill:#f96,stroke:#333,stroke-width:2px
-    style API fill:#c62828,stroke:#333,stroke-width:2px,color:#fff
-```
+                   MAX
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+    account ID   device.id   lifecycle
+        │           │
+        │       android_id
+        │           │
+        │      Advertising ID
+        │           │
+        │       App Set ID
+        │           │
+        └──── MyTracker ────────┘
+                    │
+              protobuf
+                    │
+                 gzip
+                    │
+                 HTTP POST
+                    │
+                    ▼
+tracker-api.vk-analytics.ru/v3/
 ---
 
 ## 🔍 Что мы делаем
