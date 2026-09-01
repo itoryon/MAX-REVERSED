@@ -3,11 +3,28 @@ name: Build MAX (patched)
 on:
   push:
     branches: [ "**" ]
+    tags: [ "v*" ]
   pull_request:
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: "Опубликовать GitHub Release с APK?"
+        type: boolean
+        default: false
+      release_type:
+        description: "Тип релиза (учитывается только при публикации)"
+        type: choice
+        options:
+          - prerelease
+          - release
+        default: prerelease
+      release_tag:
+        description: "Тег/имя релиза (пусто = авто build-<номер>)"
+        type: string
+        default: ""
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   APKTOOL_VERSION: 3.0.2
@@ -95,3 +112,37 @@ jobs:
           name: MAX-patched-apk
           path: MAX-patched.apk
           if-no-file-found: error
+
+      - name: Publish GitHub Release
+        if: >
+          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+          (github.event_name == 'workflow_dispatch' && inputs.publish_release)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          IN_TAG: ${{ inputs.release_tag }}
+          IN_TYPE: ${{ inputs.release_type }}
+          REF_NAME: ${{ github.ref_name }}
+          RUN_NUMBER: ${{ github.run_number }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -e
+          PRE=""
+          TARGET=""
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            TAG="$IN_TAG"
+            [ -z "$TAG" ] && TAG="build-$RUN_NUMBER"
+            [ "$IN_TYPE" = "prerelease" ] && PRE="--prerelease"
+            TARGET="--target $SHA"
+          else
+            TAG="$REF_NAME"
+            case "$TAG" in *-*) PRE="--prerelease" ;; esac
+          fi
+          cp MAX-patched.apk "MAX-${TAG}.apk"
+          NOTES="Автосборка MAX с вырезанной телеметрией/детектами. Подробности — PLAN.md. Рантайм не гарантирован — проверяйте на своём устройстве."
+          if ! gh release create "$TAG" "MAX-${TAG}.apk" \
+                --title "MAX patched — $TAG" --notes "$NOTES" $PRE $TARGET; then
+            echo "Релиз с тегом $TAG уже существует — заливаю APK в него."
+            gh release upload "$TAG" "MAX-${TAG}.apk" --clobber
+          fi
+          echo "Готово: релиз $TAG (${PRE:-обычный})."
