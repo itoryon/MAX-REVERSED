@@ -147,7 +147,7 @@
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts"/>
         </activity>
         <activity android:configChanges="orientation" android:excludeFromRecents="true" android:exported="true" android:label="" android:launchMode="singleTop" android:name="one.me.android.deeplink.LinkInterceptorActivity" android:theme="@style/OneMe.Theme.Transparent" android:windowSoftInputMode="stateHidden|adjustResize">
-            <intent-filter android:autoVerify="true" android:label="max">
+            <intent-filter android:autoVerify="true" android:label="REVmax">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
