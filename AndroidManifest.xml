@@ -156,7 +156,7 @@
                 <data android:scheme="@string/web_scheme"/>
                 <data android:host="@string/app_host"/>
             </intent-filter>
-            <intent-filter android:label="max">
+            <intent-filter android:label="REVmax">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
